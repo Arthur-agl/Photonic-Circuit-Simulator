@@ -9,7 +9,7 @@ services:
       - "5000:5000"
     environment:
       APP_SETTINGS: "configurations.DevelopmentConfig"
-      MONGODB_URL: "mongodb://flaskuser:5up3r54f3@mongodb:27017/flaskdb"
+      MONGODB_URL: "mongodb://arthur:admin@mongodb:27017/flaskdb"
       PYTHONUNBUFFERED: 1
     volumes:
       - ./backend:/app
@@ -38,7 +38,7 @@ services:
   mongodb:
     image: mongo:4.4.0
     container_name: mongodb
-    command: mongod --auth
+    command: mongod
     environment:
       MONGO_INITDB_ROOT_USERNAME: user
       MONGO_INITDB_ROOT_PASSWORD: 3xtr454f3
