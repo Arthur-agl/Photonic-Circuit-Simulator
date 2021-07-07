@@ -1,7 +1,17 @@
 -[FRONT] refactor menu components into one component
 -[BACK] refactor errors 
--temas sass ou less (pre processador CSS)
--grafico:
+
+-front:
   -jogo de cores vermelho e azul (desligado e ligado)
+  -temas sass ou less (pre processador CSS)
   -habilitar e desabilitar valores
   -incluir conexões (clicando)
+  -undo e redo
+  -colocar timestamp para todos os componentes de uma vez
+  -atalhos de teclado para deletar, desfazer e refazer
+  -possibilidade de salvar um circuito no formato de arquivo
+  -carregar circuitos por meio de arquivo salvo
+
+-back:
+  -Facilitar instalação por usuário comum (script automatico?)
+  -Adicionar perda de sinal nas conexoes
