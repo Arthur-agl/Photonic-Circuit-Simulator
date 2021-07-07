@@ -7,7 +7,8 @@ export async function validateResponse(response, expectedErrorCodes = null) {
   if (response.ok) {
     let body = {};
     try {
-      body = await response.json();
+      body = await response.text();
+      body = body === 'OK' ? {} : JSON.parse(body);
     } catch (error) {
       if (!/SyntaxError: JSON.parse/i.test(error)) {
         throw error;
@@ -21,7 +22,8 @@ export async function validateResponse(response, expectedErrorCodes = null) {
     if (expectedErrorCodes !== null) {
       let body = {};
       try {
-        body = await response.json();
+        body = await response.text();
+        body = body === 'OK' ? {} : JSON.parse(body);
       } catch (error) {
         if (!/SyntaxError: JSON.parse/i.test(error)) {
           throw error;
