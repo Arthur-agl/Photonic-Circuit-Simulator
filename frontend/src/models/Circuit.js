@@ -7,6 +7,8 @@ const createCircuit = (id, label) => {
     components: [],
     connections: [],
     isSaved: false,
+    past: [],
+    future: []
   };
 };
 

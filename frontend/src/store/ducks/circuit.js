@@ -19,6 +19,8 @@ export const Types = {
   CREATE_WITH_DATA: "circuit/CREATE_WITH_DATA",
   UPDATE_CONNECTION_POS: "circuit/UPDATE_CONNECTION_POS",
   DELETE: "circuit/DELETE",
+  UNDO: "circuit/UNDO",
+  REDO: "circuit/REDO"
 };
 
 // Reducer
@@ -60,6 +62,12 @@ export default function reducer(state = INITIAL_STATE, action) {
           content.id === state.current
             ? {
                 ...content,
+                past: content.past.concat({
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }),
                 components: content.components.concat([
                   action.payload.component_id,
                 ]),
@@ -74,6 +82,12 @@ export default function reducer(state = INITIAL_STATE, action) {
           content.id === state.current
             ? {
                 ...content,
+                past: content.past.concat({
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }),
                 label: action.payload.label,
               }
             : content
@@ -98,6 +112,12 @@ export default function reducer(state = INITIAL_STATE, action) {
           content.id === state.current
             ? {
                 ...content,
+                past: content.past.concat({
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }),
                 connections: content.connections.concat([
                   action.payload.connection,
                 ]),
@@ -112,6 +132,12 @@ export default function reducer(state = INITIAL_STATE, action) {
           content.id === state.current
             ? {
                 ...content,
+                past: content.past.concat({
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }),
                 connections: content.connections.filter(
                   (connection) =>
                     connection.targetPortID !== action.payload.portID &&
@@ -134,6 +160,12 @@ export default function reducer(state = INITIAL_STATE, action) {
           content.id === state.current
             ? {
                 ...content,
+                past: content.past.concat({
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }),
                 connections: content.connections.map((connection) =>
                   connection.originPortID === action.payload.portID
                     ? {
@@ -168,6 +200,55 @@ export default function reducer(state = INITIAL_STATE, action) {
           (instance) => instance.id !== action.payload.id
         ),
       };
+    case Types.UNDO:
+      return {
+        ...state,
+        instances: state.instances.map((content) =>
+          content.id === state.current && content.past != false
+            ? {
+                ...content,
+                future: [{
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }, ...content.future],
+
+                id: content.past.slice(-1)[0].id,
+                label: content.past.slice(-1)[0].label,
+                components: content.past.slice(-1)[0].components,
+                connections: content.past.slice(-1)[0].connections,
+
+                past: content.past.slice(0,-1),
+              }
+            : content
+        ),
+      }
+    case Types.REDO:
+      return {
+        ...state,
+        instances: state.instances.map((content) =>
+          content.id === state.current && content.future != false
+            ? {
+                ...content,
+                past: [...content.past, {
+                  id: content.id,
+                  label: content.label,
+                  components: content.components,
+                  connections: content.connections
+                }],
+
+                id: content.future[0].id,
+                label: content.future[0].label,
+                components: content.future[0].components,
+                connections: content.future[0].connections,
+
+                future: content.future.slice(1),
+              }
+            : content
+        ),
+      }
+      break;
     default:
       return state;
   }
@@ -323,4 +404,18 @@ export function deleteCircuit(id) {
       id: id,
     },
   };
+}
+
+export function undo() {
+  return {
+    type: Types.UNDO,
+    payload: {}
+  }
+}
+
+export function redo() {
+  return {
+    type: Types.REDO,
+    payload: {}
+  }
 }

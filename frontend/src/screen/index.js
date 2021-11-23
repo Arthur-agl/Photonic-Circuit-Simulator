@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import useKeyboardShortcut from 'use-keyboard-shortcut';
 import ComponentsPanel from "../components/panels/componentsPanel";
 import InspectionPanel from "../components/panels/inspectionPanel";
 import MainMenu from "../components/menus/mainMenu";
@@ -12,6 +13,8 @@ import {
   attemptChangeCurrent as attemptChangeCurrentCircuit,
   simulate,
   deleteCircuit,
+  undo,
+  redo
 } from "../store/ducks/circuit";
 import { basicKinds } from "../utils/componentBehaviour";
 import Tabs from "../components/tabs";
@@ -19,6 +22,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import DropdownMenu from "../components/menus/dropdownMenu";
 import { FileButton, EditButton } from "./MainMenuButtons";
+
 
 const buttons = [FileButton, EditButton];
 const INITIAL_WORKSPACE_HEIGHT = window.innerHeight - 8;
@@ -32,6 +36,8 @@ const Layout = ({
   circuitComponents,
   deleteCircuit,
   simulate,
+  undo,
+  redo
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [currentButton, setCurrentButton] = useState(null);
@@ -76,6 +82,9 @@ const Layout = ({
       setCurrentConnections(currentCircuit.connections);
     }
   }, [currentCircuitID, circuits, circuitComponents]);
+
+  useKeyboardShortcut(['Control', 'Z'], () => undo());
+  useKeyboardShortcut(['Control', 'Y'], () => redo());
 
   const handleCloseTab = async (id) => {
     const response = await api.closeCircuitTab(id);
@@ -164,6 +173,8 @@ const mapDispatchToProps = (dispatch) => ({
   createCircuit: bindActionCreators(createCircuit, dispatch),
   simulate: bindActionCreators(simulate, dispatch),
   deleteCircuit: bindActionCreators(deleteCircuit, dispatch),
+  undo: bindActionCreators(undo, dispatch),
+  redo: bindActionCreators(redo, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);
