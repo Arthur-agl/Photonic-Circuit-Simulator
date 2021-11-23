@@ -1,14 +1,8 @@
-from app.database.db import db
 import mongoengine_goodjson as gj
-import pandas as pd
 import numpy as np
-from decimal import Decimal
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
-from sympy.solvers import solve
-from sympy import Symbol
-from mongoengine.queryset.visitor import Q
+import pandas as pd
 import scipy as sp
+from app.database.db import db
 
 class Lumerical(gj.Document):
   switch_cols = {
@@ -33,7 +27,7 @@ class Lumerical(gj.Document):
   betas = db.ListField(db.DecimalField(precision=10))
 
   df = None
-  df_switch = pd.read_csv('app/resources/LumericalValues/switchValues.csv')
+  df_switch = pd.read_csv('app/resources/LumericalValues/switchValuesV2.csv')
   df_y_connector = pd.read_csv('app/resources/LumericalValues/yConnectorValues.csv')
 
   def get_col_index(col):
@@ -82,87 +76,16 @@ class Lumerical(gj.Document):
     if Lumerical.df is None:
       return None
 
-    spline = Lumerical.get_spline(col)
-    result = spline["approx"](input, control)
+    if col in Lumerical.switch_cols:
+      colindex = Lumerical.get_col_index(col)
+      ddf = Lumerical.df_switch
+      abc = ddf[(ddf['Control'] == np.floor(input)) & (ddf['Input'] == np.floor(control))]
+      result_tmp = abc.iloc[0][colindex]
+      result = round(result_tmp,5)
+
+    elif col in Lumerical.y_connector_cols:
+      spline = Lumerical.get_spline(col)
+      result_tmp = spline["approx"](input, control)
+      result = np.round(result_tmp,5)
 
     return result if result > 0 else 0
-    
-
-
-  def initialize_old():
-    for degree in range(1, 5):
-      Lumerical.variables.append(Lumerical.generateVariables(degree))
-
-    if (Lumerical.objects.count() == 0):
-      Lumerical.df = Lumerical.df_switch
-      for key in Lumerical.switch_cols:
-        for degree in range(1, 5):
-          betas = Lumerical.polynomialRegression(Lumerical.switch_cols[key], degree)
-
-          doc = {
-            'kind': key,
-            'degree': degree,
-            'betas': betas
-          }
-          Lumerical(**doc).save()
-
-      Lumerical.df = Lumerical.df_y_connector
-      for key in Lumerical.y_connector_cols:
-        for degree in range(1, 5):
-          betas = Lumerical.polynomialRegression(Lumerical.y_connector_cols[key], degree)
-
-          doc = {
-            'kind': key,
-            'degree': degree,
-            'betas': betas
-          }
-          Lumerical(**doc).save()
-
-  #𝑓(𝑥₁, 𝑥₂) = 𝑏₀ + 𝑏₁𝑥₁ + 𝑏₂𝑥₂ + 𝑏₃𝑥₁² + 𝑏₄𝑥₁𝑥₂ + 𝑏₅𝑥₂²
-  def polynomialRegression(y_col, degree):
-    x = Lumerical.df.iloc[:,0:2].copy().to_numpy()
-    y = Lumerical.df.iloc[:,y_col].copy().to_numpy()
-
-    x_ = PolynomialFeatures(degree=degree, include_bias=False).fit_transform(x)
-    model_p = LinearRegression().fit(x_, y)
-    r_sq_p = model_p.score(x_, y)
-
-    betas = [model_p.intercept_]
-    betas.extend(model_p.coef_)
-    return betas
-
-  def generateVariables(degree):
-    if (degree <= 0):
-      return []
-    if (degree == 1):
-      return ['1*', 'x*', 'y*']
-      
-    curr = Lumerical.generateVariables(degree-1)
-
-    pol_vals = []
-    for x in range(degree, -1, -1):
-      for y in range(degree-x, degree-x+1):
-        pol_vals.append('x*'*x + 'y*'*y)
-
-    for val in pol_vals:
-      curr.append(val)
-    
-    return curr
-
-  def calculate_old(col, control, input):
-    x = float(input)
-    y = float(control)
-    Lumerical.set_df(col)
-
-    if Lumerical.df is None:
-      return None
-
-    degree = 4 if input >= 0 and input <= 60 and control >= 0 and control <= 60 else 2
-    betas = Lumerical.objects(Q(kind=col) & Q(degree=degree)).get().betas
-    variables = Lumerical.variables[degree-1]
-
-    function = [x + str(y) for x,y in zip(variables,betas)]
-    function = '+'.join(function)
-
-    result = eval(function)
-    return result if result >= 0 else 0
