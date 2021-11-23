@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Stage, Container } from "@inlet/react-pixi";
-import CircuitComponent from "../circuitComponent";
+import CircuitComponent from "../circuitComponents/genericComponent";
 import "./styles.css";
 import Grid from "../grid";
 import GenericLine from "../genericLine";

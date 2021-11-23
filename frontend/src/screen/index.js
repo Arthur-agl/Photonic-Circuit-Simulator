@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import ComponentsMenu from "../components/componentsMenu";
-import InspectionMenu from "../components/inspectionMenu";
-import MainMenu from "../components/mainMenu";
+import ComponentsPanel from "../components/panels/componentsPanel";
+import InspectionPanel from "../components/panels/inspectionPanel";
+import MainMenu from "../components/menus/mainMenu";
 import Workspace from "../components/workspace";
-import AnalyticsMenu from "../components/analyticsMenu";
+import AnalyticsPanel from "../components/panels/analyticsPanel";
 import "./styles.css";
 import api from "../api";
 import {
@@ -17,7 +17,7 @@ import { basicKinds } from "../utils/componentBehaviour";
 import Tabs from "../components/tabs";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import DropdownMenu from "../components/dropdownMenu";
+import DropdownMenu from "../components/menus/dropdownMenu";
 import { FileButton, EditButton } from "./MainMenuButtons";
 
 const buttons = [FileButton, EditButton];
@@ -107,7 +107,7 @@ const Layout = ({
         left={left}
       />
       <div className="screen">
-        <ComponentsMenu
+        <ComponentsPanel
           basicComponents={basicKinds}
           customComponents={customComponents}
         />
@@ -138,12 +138,12 @@ const Layout = ({
               </div>
             ))}
           </Tabs>
-          <AnalyticsMenu
+          <AnalyticsPanel
             analyticsHeight={analyticsHeight}
             handleChangeAnalyticsHeight={handleChangeAnalyticsHeight}
           />
         </div>
-        <InspectionMenu simulate={simulate} />
+        <InspectionPanel simulate={simulate} />
       </div>
     </div>
   );

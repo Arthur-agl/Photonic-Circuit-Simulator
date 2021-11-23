@@ -1,0 +1,6 @@
+.dropdownMenu {
+  position: absolute;
+  background-color: white;
+  border: 2px solid;
+  z-index: 2;
+}

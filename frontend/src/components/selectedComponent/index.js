@@ -13,6 +13,7 @@ import {
 } from "../../store/ducks/circuitComponent";
 import { FaTrashAlt } from "react-icons/fa";
 import { applyDebounce, createDebounce } from "../../utils/debounce";
+import useKeyboardShortcut from 'use-keyboard-shortcut';
 
 const SelectedComponent = ({
   selectedComponent,
@@ -41,6 +42,8 @@ const SelectedComponent = ({
   useEffect(() => {
     createDebounce(saveLabelValue, 800);
   }, [saveLabelValue]);
+
+  useKeyboardShortcut(['Delete'], () => deleteComponent());
 
   return (
     <div>
