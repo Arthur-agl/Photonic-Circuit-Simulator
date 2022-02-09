@@ -42,6 +42,7 @@ const Layout = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [currentButton, setCurrentButton] = useState(null);
   const [left, setLeft] = useState(0);
+  const [top, setTop] = useState(0);
   const [currentComponents, setCurrentComponents] = useState([]);
   const [currentConnections, setCurrentConnections] = useState([]);
   const [customComponents, setCustomComponents] = useState([]);
@@ -56,6 +57,7 @@ const Layout = ({
     setCurrentButton(buttons[index]);
     const element = document.getElementById(buttons[index].name);
     setLeft(element.getBoundingClientRect().left);
+    setTop(element.getBoundingClientRect().top);
   };
 
   useEffect(() => {
@@ -83,8 +85,8 @@ const Layout = ({
     }
   }, [currentCircuitID, circuits, circuitComponents]);
 
-  useKeyboardShortcut(['Control', 'Z'], () => undo());
-  useKeyboardShortcut(['Control', 'Y'], () => redo());
+  useKeyboardShortcut(["Control", "Z"], () => undo());
+  useKeyboardShortcut(["Control", "Y"], () => redo());
 
   const handleCloseTab = async (id) => {
     const response = await api.closeCircuitTab(id);
@@ -114,6 +116,7 @@ const Layout = ({
         setShowDropdown={setShowDropdown}
         items={currentButton ? currentButton.items : []}
         left={left}
+        top={top}
       />
       <div className="screen">
         <ComponentsPanel

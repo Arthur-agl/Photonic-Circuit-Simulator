@@ -19,8 +19,13 @@ export default function reducer(state = INITIAL_STATE, action) {
     case Types.CREATE:
       return {
         ...state,
-        instances: state.instances.concat(
-          createPorts(action.payload.ports, action.payload.parentID, action.payload.parentKind, action.payload.isInput)
+        instances: state.instances?.concat(
+          createPorts(
+            action.payload.ports,
+            action.payload.parentID,
+            action.payload.parentKind,
+            action.payload.isInput
+          )
         ),
       };
     case Types.SET_WORLD_TRANSFORM:

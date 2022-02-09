@@ -1,7 +1,7 @@
 import mongoengine_goodjson as gj
 import numpy as np
 import pandas as pd
-import scipy as sp
+from scipy.interpolate import Rbf
 from app.database.db import db
 
 class Lumerical(gj.Document):
@@ -54,7 +54,7 @@ class Lumerical(gj.Document):
 
     return {
       'col': col,
-      'approx': sp.interpolate.Rbf(x,y,z,function='thin_plate',smooth=5, episilon=5)
+      'approx': Rbf(x,y,z,function='thin_plate',smooth=5, episilon=5)
     }
 
   def get_spline(col):

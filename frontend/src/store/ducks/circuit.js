@@ -112,7 +112,7 @@ export default function reducer(state = INITIAL_STATE, action) {
           content.id === state.current
             ? {
                 ...content,
-                past: content.past.concat({
+                past: content.past?.concat({
                   id: content.id,
                   label: content.label,
                   components: content.components,
@@ -204,7 +204,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         instances: state.instances.map((content) =>
-          content.id === state.current && content.past != false
+          content.id === state.current && content.past !== false
             ? {
                 ...content,
                 future: [{
@@ -228,7 +228,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         instances: state.instances.map((content) =>
-          content.id === state.current && content.future != false
+          content.id === state.current && content.future !== false
             ? {
                 ...content,
                 past: [...content.past, {
@@ -248,7 +248,6 @@ export default function reducer(state = INITIAL_STATE, action) {
             : content
         ),
       }
-      break;
     default:
       return state;
   }
